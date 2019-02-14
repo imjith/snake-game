@@ -1,18 +1,18 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+  <div id="app" class="container" >
+    <GameCanvas tabindex="0"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import GameCanvas from "./components/GameCanvas.vue";
 
 export default {
   name: "app",
   components: {
-    HelloWorld
-  }
+    GameCanvas
+  },
+  methods: {}
 };
 </script>
 
