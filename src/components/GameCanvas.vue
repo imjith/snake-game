@@ -5,7 +5,7 @@
     @keyup.down="moveDown"
     @keyup.left="moveLeft"
     class="game-canvas"
-    :style="{'max-width': (w*size+(size*2))+'px'}"
+    :style="{'max-width': (w*size)+'px'}"
   >
     <div
       v-for="n in size*size"
@@ -13,6 +13,8 @@
       :class="['pixel', snake[n]]"
       :style="{width:w+'px',height:w+'px'}"
     ></div>
+
+    <pre>{{tail+" , "+head}}</pre>
   </div>
 </template>
 
@@ -25,11 +27,13 @@ export default {
 
   data() {
     return {
-      size: 5,
+      size: 10,
       w: 20,
-      snake: Array(26).fill("white"),
-      head: 13,
-      tail: 12,
+      snake: Array(101).fill("white"),
+      defHead: 44,
+      defTail: 42,
+      head: 44,
+      tail: 42,
       movingLef: false,
       movingRight: false,
       movingUp: false,
@@ -37,123 +41,199 @@ export default {
     };
   },
   mounted: function() {
-    for (let i = this.tail; i <= this.head; i++) {
+    for (let i = this.defTail; i <= this.defHead; i++) {
       this.snake.splice(i, 1, "snake");
     }
   },
   methods: {
+    getHeadRow() {
+      return Math.ceil(this.head / this.size);
+    },
+    getTailRow() {
+      return Math.ceil(this.tail / this.size);
+    },
+    getHeadCol() {
+      return this.head % this.size;
+    },
+    getTailCol() {
+      return this.tail % this.size;
+    },
+    gameOver() {
+      alert("Game over");
+      this.snake = Array(101).fill("white");
+      this.head = this.defHead;
+      this.tail = this.defTail;
+      for (let i = this.defTail; i <= this.defHead; i++) {
+        this.snake.splice(i, 1, "snake");
+      }
+    },
     moveRight() {
-      let tailCol = this.tail % 5;
-      let headCol = this.head % 5;
+      let tailCol = this.getTailCol();
+      let headCol = this.getHeadCol();
       if (headCol != 0) {
-        let headRow = Math.ceil(this.head / 5);
-        let tailRow = Math.ceil(this.tail / 5);
+        let headRow = this.getHeadRow();
+        let tailRow = this.getTailRow();
         if (this.head > this.tail || tailRow != headRow) {
           this.snake.splice(this.tail, 1, "white");
-          this.head += 1;
+
           if (tailCol == headCol) {
             if (this.head > this.tail) {
-              this.tail += 5;
+              this.tail += this.size;
             } else {
-              this.tail -= 5;
+              this.tail -= this.size;
             }
           } else {
-            this.tail += 1;
+            if (headRow > tailRow) {
+              if (this.snake[this.tail + this.size] != "white") {
+                this.tail += this.size;
+              } else {
+                this.tail += 1;
+              }
+            } else {
+              if (headCol > tailCol) {
+                this.tail += 1;
+              } else {
+                this.tail -= 1;
+              }
+            }
           }
-
+          this.head += 1;
           this.snake.splice(this.head, 1, "snake");
-          this.snake.splice(this.tail, 1, "snake");
+          //this.snake.splice(this.tail, 1, "snake");
         }
       } else {
-        alert("Game over");
+        this.gameOver();
       }
     },
     moveLeft() {
-      let headRow = Math.ceil(this.head / 5);
-      let headCol = this.head % 5;
+      let headRow = this.getHeadRow();
+      let headCol = this.getHeadCol();
       if (headCol != 1) {
-        let tailRow = Math.ceil(this.tail / 5);
+        let tailRow = this.getTailRow();
         if (this.head < this.tail || tailRow != headRow) {
-          let tailCol = this.tail % 5;
+          let tailCol = this.getTailCol();
 
           this.snake.splice(this.tail, 1, "white");
           this.head -= 1;
           if (tailCol == headCol) {
             if (this.head > this.tail) {
-              this.tail += 5;
+              this.tail += this.size;
             } else {
-              this.tail -= 5;
+              this.tail -= this.size;
             }
           } else {
-            this.tail -= 1;
+            if (tailRow == headRow) {
+              this.tail -= 1;
+            } else if (headRow < tailRow && headCol > tailCol) {
+              this.tail += 1;
+            } else if (headRow < tailRow && headCol < tailCol) {
+              this.tail -= 1;
+            } else {
+              this.tail += this.size;
+            }
           }
 
           this.snake.splice(this.head, 1, "snake");
-          this.snake.splice(this.tail, 1, "snake");
+          // this.snake.splice(this.tail, 1, "snake");
         }
       } else {
-        alert("Game over");
+        this.gameOver();
       }
     },
     moveUp() {
-      let headRow = Math.ceil(this.head / 5);
+      let headRow = this.getHeadRow();
+      let tailRow = this.getTailRow();
       if (headRow > 1) {
         /*
         invalid conditions
         1. when head is large and both in same col
         2. 
         */
-        let tailCol = this.tail % 5;
-        let headCol = this.head % 5;
+        let tailCol = this.getTailCol();
+        let headCol = this.getHeadCol();
         if (this.head < this.tail || tailCol != headCol) {
           this.snake.splice(this.tail, 1, "white");
 
           if (tailCol == headCol) {
-            this.tail -= 5;
+            this.tail -= this.size;
           } else {
-            if (this.head > this.tail) {
-              this.tail += 1;
+            if (headRow == tailRow) {
+              if (headCol > tailCol) {
+                this.tail += 1;
+              } else {
+                this.tail -= 1;
+              }
             } else {
-              this.tail -= 1;
+              if (headRow > tailRow && headCol > tailCol) {
+                this.tail += this.size;
+              } else if (headRow < tailRow && headCol > tailCol) {
+                if (this.snake[this.head + this.size] != "white") {
+                  this.tail += 1;
+                } else {
+                  this.tail -= this.size;
+                }
+              } else if (headRow < tailRow && headCol < tailCol) {
+                if (this.snake[this.head + this.size] != "white") {
+                  this.tail -= 1;
+                } else {
+                  this.tail -= this.size;
+                }
+              } else {
+                this.tail += 1;
+              }
             }
           }
-          this.head -= 5;
+          this.head -= this.size;
 
-          this.snake.splice(this.tail, 1, "snake");
+          //this.snake.splice(this.tail, 1, "snake");
           this.snake.splice(this.head, 1, "snake");
         }
       } else {
-        alert("game over");
+        this.gameOver();
       }
     },
     moveDown() {
-      let headRow = Math.ceil(this.head / 5);
-      if (headRow < 5) {
+      let headRow = this.getHeadRow();
+      let tailRow = this.getTailRow();
+      if (headRow < this.size) {
         /*
         invalid conditions
         1. when head is small and both in same col
         2. 
         */
-        let tailCol = this.tail % 5;
-        let headCol = this.head % 5;
-        if (this.head > this.tail || tailCol != headCol) {
+        let tailCol = this.getTailCol();
+        let headCol = this.getHeadCol();
+        if (
+          this.head > this.tail ||
+          (tailCol != headCol && this.snake[this.head + this.size] == "white")
+        ) {
           this.snake.splice(this.tail, 1, "white");
           if (tailCol == headCol) {
-            this.tail += 5;
+            this.tail += this.size;
           } else {
-            if (this.head > this.tail) {
+            if (headRow == tailRow) {
               this.tail += 1;
+            } else if (headCol > tailCol) {
+              if (headRow > tailRow) {
+                this.tail += this.size;
+              } else {
+                this.tail -= this.size;
+              }
             } else {
-              this.tail -= 1;
+              if (headRow > tailRow) {
+                this.tail -= 1;
+              } else {
+                this.tail -= this.size;
+              }
             }
           }
-          this.head += 5;
 
-          this.snake.splice(this.tail, 1, "snake");
+          this.head += this.size;
+          //this.snake.splice(this.tail, 1, "snake");
           this.snake.splice(this.head, 1, "snake");
         }
       } else {
-        alert("game over");
+        this.gameOver();
       }
     }
   }
@@ -163,7 +243,7 @@ export default {
 
 <style scoped>
 .pixel {
-  border: 1px solid lightgrey;
+  border: 1px solid lightblue;
 }
 .game-canvas {
   display: flex;
