@@ -8,7 +8,7 @@
     :style="{'max-width': (w*size)+'px'}"
   >
     <div class="score">
-      <h2 >Score : {{score}}</h2>
+      <h2>Score : {{score}}</h2>
       <h5>Best : {{best}}</h5>
     </div>
 
@@ -43,7 +43,7 @@ export default {
       tCount: 0,
       treasurePos: 0,
       score: 0,
-      best: 0,
+      best: 0
     };
   },
   mounted: function() {
@@ -67,7 +67,7 @@ export default {
     getTheme(n) {
       let v = this.snake[n];
       if (v == 0) {
-        return "white";
+        return "blank";
       }
       if (v == 1) {
         return "snake";
@@ -192,15 +192,15 @@ export default {
 
 <style scoped>
 .pixel {
-  border: 1px solid rgb(207, 229, 229);
+  border: 1px solid rgb(241, 240, 240);
 }
 .game-canvas {
   display: flex;
   flex-wrap: wrap;
 }
 
-.white {
-  background-color: rgb(207, 229, 229);
+.blank {
+  background-color: rgb(241, 240, 240);
 }
 
 .snake {
@@ -208,6 +208,9 @@ export default {
 }
 
 .treasure {
-  background-color: goldenrod;
+  background-color: rgb(171, 123, 1);
+  box-shadow: 0 0 5px rgb(217, 208, 26);
+  border-width: 2px;
+  border-color: rgba(217, 208, 26, 1);
 }
 </style>
