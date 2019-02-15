@@ -1,20 +1,25 @@
 <template>
   <div
+    tabindex="0"
     @keyup.right="move(1)"
     @keyup.up="move(2)"
     @keyup.down="move(-2)"
     @keyup.left="move(-1)"
-    class="game-canvas"
     :style="{'max-width': (w*size)+'px'}"
   >
-    <div
-      v-for="n in size*size"
-      :key="n"
-      :class="['pixel', getTheme(n)]"
-      :style="{width:w+'px',height:w+'px'}"
-    ></div>
+    <div class="score">
+      <h2 >Score : {{score}}</h2>
+      <h5>Best : {{best}}</h5>
+    </div>
 
-    <pre>{{tail+" , "+head}}</pre>
+    <div class="game-canvas" :style="{'max-width': (w*size)+'px'}">
+      <div
+        v-for="n in size*size"
+        :key="n"
+        :class="['pixel', getTheme(n)]"
+        :style="{width:w+'px',height:w+'px'}"
+      ></div>
+    </div>
   </div>
 </template>
 
@@ -36,7 +41,9 @@ export default {
       isMoving: false,
       task: null,
       tCount: 0,
-      treasurePos: 0
+      treasurePos: 0,
+      score: 0,
+      best: 0,
     };
   },
   mounted: function() {
@@ -81,6 +88,8 @@ export default {
       clearInterval(this.task);
       this.task = null;
       this.tCount = 0;
+      this.best = this.score;
+      this.score = 0;
       for (let i = this.defTail; i <= this.defHead; i++) {
         this.snake.splice(i, 1, 1);
       }
@@ -96,12 +105,10 @@ export default {
       );
     },
     move(e) {
-      console.log(`event :${e}`);
-      if (null != this.task) {
-        clearInterval(this.task);
-      }
       if (e != -this.curMovement) {
-        console.log(`Moving : ${e}`);
+        if (null != this.task) {
+          clearInterval(this.task);
+        }
         this.isMoving = true;
         this.startRunning(e);
         this.curMovement = e;
@@ -118,13 +125,14 @@ export default {
           }
           this.moveSnake(e);
         }
-      }, 200);
+      }, 100);
     },
     moveSnake(e) {
       this.moveHead(e);
       if (this.head == this.treasurePos) {
         this.tCount = 0;
         this.treasurePos = 0;
+        this.score += 1;
       } else {
         this.moveTail(e);
       }
