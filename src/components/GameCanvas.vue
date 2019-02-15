@@ -10,7 +10,7 @@
     <div
       v-for="n in size*size"
       :key="n"
-      :class="['pixel', snake[n]==0?'white':'snake']"
+      :class="['pixel', getTheme(n)]"
       :style="{width:w+'px',height:w+'px'}"
     ></div>
 
@@ -34,7 +34,9 @@ export default {
       tail: 42,
       curMovement: 1,
       isMoving: false,
-      task: null
+      task: null,
+      tCount: 0,
+      treasurePos: 0
     };
   },
   mounted: function() {
@@ -55,6 +57,20 @@ export default {
     getTailCol() {
       return this.tail % this.size;
     },
+    getTheme(n) {
+      let v = this.snake[n];
+      if (v == 0) {
+        return "white";
+      }
+      if (v == 1) {
+        return "snake";
+      }
+
+      if (v == 2) {
+        return "treasure";
+      }
+      return "";
+    },
     gameOver() {
       alert("Game over");
       this.snake = Array(1601).fill(0);
@@ -64,6 +80,7 @@ export default {
       this.curMovement = 1;
       clearInterval(this.task);
       this.task = null;
+      this.tCount = 0;
       for (let i = this.defTail; i <= this.defHead; i++) {
         this.snake.splice(i, 1, 1);
       }
@@ -95,13 +112,22 @@ export default {
         if (this.isGameOver(e)) {
           this.gameOver();
         } else {
+          this.tCount += 1;
+          if (this.tCount == 6) {
+            this.generateTresure();
+          }
           this.moveSnake(e);
         }
       }, 200);
     },
     moveSnake(e) {
-      this.moveTail(e);
       this.moveHead(e);
+      if (this.head == this.treasurePos) {
+        this.tCount = 0;
+        this.treasurePos = 0;
+      } else {
+        this.moveTail(e);
+      }
     },
     moveHead(e) {
       if (e == 1) {
@@ -127,6 +153,17 @@ export default {
         this.tail += this.size;
       }
       this.snake.splice(this.tail, 1, 1);
+    },
+    generateTresure() {
+      let t = null;
+      while (t == null) {
+        let rn = Math.floor(Math.random() * 1601) + 1;
+        if (this.snake[rn] == 0) {
+          t = rn;
+        }
+      }
+      this.treasurePos = t;
+      this.snake.splice(this.treasurePos, 1, 2);
     },
     isUpperEmpty(pos) {
       return this.snake[pos - this.size] == 0;
@@ -160,5 +197,9 @@ export default {
 
 .snake {
   background-color: black;
+}
+
+.treasure {
+  background-color: goldenrod;
 }
 </style>
