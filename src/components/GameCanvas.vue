@@ -24,15 +24,16 @@
 </template>
 
 <script>
+var Deque = require("collections/deque");
 export default {
   name: "GameCanvas",
   props: {},
 
   data() {
     return {
-      size: 40,
-      w: 10,
-      snake: Array(1601).fill(0),
+      size: 30,
+      w: 15,
+      snake: Array(901).fill(0),
       defHead: 44,
       defTail: 42,
       head: 44,
@@ -41,28 +42,22 @@ export default {
       isMoving: false,
       task: null,
       tCount: 0,
-      treasurePos: 0,
+      foodPos: 0,
       score: 0,
-      best: 0
+      best: 0,
+      deque: null
     };
   },
   mounted: function() {
-    for (let i = this.defTail; i <= this.defHead; i++) {
-      this.snake.splice(i, 1, 1);
-    }
+    this.initSnake();
   },
   methods: {
-    getHeadRow() {
-      return Math.ceil(this.head / this.size);
-    },
-    getTailRow() {
-      return Math.ceil(this.tail / this.size);
-    },
-    getHeadCol() {
-      return this.head % this.size;
-    },
-    getTailCol() {
-      return this.tail % this.size;
+    initSnake() {      
+      this.deque = new Deque();
+      for (let i = this.defHead; i >= this.defTail; i--) {
+        this.snake.splice(i, 1, 1);
+        this.deque.push(i);
+      }
     },
     getTheme(n) {
       let v = this.snake[n];
@@ -74,13 +69,13 @@ export default {
       }
 
       if (v == 2) {
-        return "treasure";
+        return "food";
       }
       return "";
     },
     gameOver() {
       alert("Game over");
-      this.snake = Array(1601).fill(0);
+      this.snake = Array(901).fill(0);
       this.head = this.defHead;
       this.tail = this.defTail;
       this.isMoving = false;
@@ -88,11 +83,11 @@ export default {
       clearInterval(this.task);
       this.task = null;
       this.tCount = 0;
-      this.best = this.score;
-      this.score = 0;
-      for (let i = this.defTail; i <= this.defHead; i++) {
-        this.snake.splice(i, 1, 1);
+      if (this.score > this.best) {
+        this.best = this.score;
       }
+      this.score = 0;
+      this.initSnake();
     },
     isGameOver(e) {
       let row = Math.ceil(this.head / this.size);
@@ -129,9 +124,9 @@ export default {
     },
     moveSnake(e) {
       this.moveHead(e);
-      if (this.head == this.treasurePos) {
+      if (this.head == this.foodPos) {
         this.tCount = 0;
-        this.treasurePos = 0;
+        this.foodPos = 0;
         this.score += 1;
       } else {
         this.moveTail(e);
@@ -147,19 +142,13 @@ export default {
       } else {
         this.head += this.size;
       }
+      this.deque.unshift(this.head);
       this.snake.splice(this.head, 1, 1);
     },
     moveTail(e) {
+      this.deque.pop();
       this.snake.splice(this.tail, 1, 0);
-      if (!this.isUpperEmpty(this.tail)) {
-        this.tail -= this.size;
-      } else if (!this.isRightEmpty(this.tail)) {
-        this.tail += 1;
-      } else if (!this.isLeftEmpty(this.tail)) {
-        this.tail -= 1;
-      } else {
-        this.tail += this.size;
-      }
+      this.tail = this.deque.peekBack();
       this.snake.splice(this.tail, 1, 1);
     },
     generateTresure() {
@@ -170,20 +159,8 @@ export default {
           t = rn;
         }
       }
-      this.treasurePos = t;
-      this.snake.splice(this.treasurePos, 1, 2);
-    },
-    isUpperEmpty(pos) {
-      return this.snake[pos - this.size] == 0;
-    },
-    isBottomEmpty(pos) {
-      return this.snake[pos + this.size] == 0;
-    },
-    isLeftEmpty(pos) {
-      return this.snake[pos - 1] == 0;
-    },
-    isRightEmpty(pos) {
-      return this.snake[pos + 1] == 0;
+      this.foodPos = t;
+      this.snake.splice(this.foodPos, 1, 2);
     }
   }
 };
@@ -204,10 +181,11 @@ export default {
 }
 
 .snake {
-  background-color: black;
+  background-color: rgb(49, 168, 19);
+  border: 0px solid;
 }
 
-.treasure {
+.food {
   background-color: rgb(171, 123, 1);
   box-shadow: 0 0 5px rgb(217, 208, 26);
   border-width: 2px;
