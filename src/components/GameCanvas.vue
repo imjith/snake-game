@@ -52,7 +52,7 @@ export default {
     this.initSnake();
   },
   methods: {
-    initSnake() {      
+    initSnake() {
       this.deque = new Deque();
       for (let i = this.defHead; i >= this.defTail; i--) {
         this.snake.splice(i, 1, 1);
@@ -116,7 +116,7 @@ export default {
         } else {
           this.tCount += 1;
           if (this.tCount == 6) {
-            this.generateTresure();
+            this.createFood();
           }
           this.moveSnake(e);
         }
@@ -142,8 +142,14 @@ export default {
       } else {
         this.head += this.size;
       }
+      if (this.snake[this.head] === 1) {
+        this.gameOver();
+        return true;
+      }
+
       this.deque.unshift(this.head);
       this.snake.splice(this.head, 1, 1);
+      return false;
     },
     moveTail(e) {
       this.deque.pop();
@@ -151,7 +157,7 @@ export default {
       this.tail = this.deque.peekBack();
       this.snake.splice(this.tail, 1, 1);
     },
-    generateTresure() {
+    createFood() {
       let t = null;
       while (t == null) {
         let rn = Math.floor(Math.random() * 1601) + 1;
