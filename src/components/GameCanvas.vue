@@ -31,7 +31,7 @@ export default {
   data() {
     return {
       size: 30,
-      w: 15,
+      w: 20,
       snake: Array(901).fill(0),
       defHead: 44,
       defTail: 42,
@@ -146,14 +146,14 @@ export default {
         return true;
       }
 
-      this.snake_body.splice(0,0,this.head);
+      this.snake_body.splice(0, 0, this.head);
       this.snake.splice(this.head, 1, 1);
       return false;
     },
     moveTail(e) {
-      this.snake_body.splice(-1,1);
+      this.snake_body.splice(-1, 1);
       this.snake.splice(this.tail, 1, 0);
-      this.tail = this.snake_body[this.snake_body.length-1];
+      this.tail = this.snake_body[this.snake_body.length - 1];
       this.snake.splice(this.tail, 1, 1);
     },
     createFood() {
@@ -174,7 +174,7 @@ export default {
 
 <style scoped>
 .pixel {
-  border: 1px solid rgb(241, 240, 240);
+  border: 0px solid rgb(241, 240, 240);
 }
 .game-canvas {
   display: flex;
@@ -191,9 +191,10 @@ export default {
 }
 
 .food {
-  background-color: rgb(171, 123, 1);
-  box-shadow: 0 0 5px rgb(217, 208, 26);
-  border-width: 2px;
-  border-color: rgba(217, 208, 26, 1);
+  background-image: url("../assets/image/apple.png");
+  background-color: rgb(241, 240, 240);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
 }
 </style>
