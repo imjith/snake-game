@@ -24,7 +24,6 @@
 </template>
 
 <script>
-var Deque = require("collections/deque");
 export default {
   name: "GameCanvas",
   props: {},
@@ -45,7 +44,7 @@ export default {
       foodPos: 0,
       score: 0,
       best: 0,
-      deque: null
+      snake_body: null
     };
   },
   mounted: function() {
@@ -53,10 +52,10 @@ export default {
   },
   methods: {
     initSnake() {
-      this.deque = new Deque();
+      this.snake_body = [];
       for (let i = this.defHead; i >= this.defTail; i--) {
         this.snake.splice(i, 1, 1);
-        this.deque.push(i);
+        this.snake_body.push(i);
       }
     },
     getTheme(n) {
@@ -147,14 +146,14 @@ export default {
         return true;
       }
 
-      this.deque.unshift(this.head);
+      this.snake_body.splice(0,0,this.head);
       this.snake.splice(this.head, 1, 1);
       return false;
     },
     moveTail(e) {
-      this.deque.pop();
+      this.snake_body.splice(-1,1);
       this.snake.splice(this.tail, 1, 0);
-      this.tail = this.deque.peekBack();
+      this.tail = this.snake_body[this.snake_body.length-1];
       this.snake.splice(this.tail, 1, 1);
     },
     createFood() {
