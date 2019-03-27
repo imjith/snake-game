@@ -1,5 +1,7 @@
 # snake-game
 
+![alt text](https://github.com/imjith/snake-game/blob/master/ss.png)
+
 ## Project setup
 ```
 npm install
