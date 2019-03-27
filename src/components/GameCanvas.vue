@@ -31,7 +31,7 @@ export default {
   data() {
     return {
       size: 30,
-      w: 20,
+      w: 18,
       snake: Array(901).fill(0),
       defHead: 44,
       defTail: 42,
@@ -193,8 +193,8 @@ export default {
 .food {
   background-image: url("../assets/image/apple.png");
   background-color: rgb(241, 240, 240);
-  background-size: cover;
+  background-size: contain;
   background-repeat: no-repeat;
-  background-position: center center;
+  background-position: center center fixed;
 }
 </style>
